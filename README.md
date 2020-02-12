@@ -1,3 +1,3 @@
 # js-projects
 
-little projects based on the library p5.js in JavaScript.
+Little projects based on the library p5.js in JavaScript.
