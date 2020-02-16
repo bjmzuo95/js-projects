@@ -1,4 +1,5 @@
 let grid;
+let score = 0;
 
 function blankGrid() {
     return [
@@ -9,18 +10,36 @@ function blankGrid() {
     ];
 }
 
-function setup() {
-    createCanvas(400, 400);
-    grid = blankGrid();
-    console.table(grid);
-    addNumber();
-    addNumber();
-    console.table(grid);
+function isGameOver() {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            if (grid[i][j] == 0) {
+                return false;
+            }
+            if (i != 3 && grid[i][j] == grid[i + 1][j]) {
+                return false;
+            }
+            if (j != 3 && grid[i][j] == grid[i][j + 1]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
-function draw() {
+function setup() {
+    createCanvas(400, 400);
+    noLoop();
+    grid = blankGrid();
+    addNumber();
+    addNumber();
+    updateCanvas();
+}
+
+function updateCanvas() {
     background(255);
     drawGrid();
+    select('#score').html(score);
 }
 
 function drawGrid() {
@@ -35,9 +54,13 @@ function drawGrid() {
             let val = grid[i][j];
             if (grid[i][j] != 0) {
                 textAlign(CENTER, CENTER);
-                textSize(64);
+                // let fs = map(log(val), 0, log(2048), 64, 16);
+                let s = "" + val;
+                let len = s.length - 1;
+                let sizes = [64, 64, 48, 32];
                 fill(0);
                 noStroke();
+                textSize(sizes[len]);
                 text(val, i * w + w / 2, j * w + w / 2);
             }
         }
@@ -49,6 +72,7 @@ function keyPressed() {
     let flipped = false;
     let rotated = false;
     let played = true;
+
     if (keyCode === DOWN_ARROW) {
         // DO NOTHING
     } else if (keyCode === UP_ARROW) {
@@ -84,6 +108,12 @@ function keyPressed() {
 
         if (compare(past, grid)) {
             addNumber();
+        }
+
+        updateCanvas();
+        let gameover = isGameOver();
+        if (gameover) {
+            console.log('GAME OVER')
         }
     }
 }
@@ -147,6 +177,7 @@ function combine(row) {
         let b = row[i - 1];
         if (a == b) {
             row[i] = a + b;
+            score += row[i];
             row[i - 1] = 0;
         }
     }
