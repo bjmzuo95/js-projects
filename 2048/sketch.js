@@ -1,4 +1,5 @@
 let grid;
+let grid_new;
 let score = 0;
 
 function blankGrid() {
@@ -27,10 +28,22 @@ function isGameOver() {
     return true;
 }
 
+function isGameWon() {
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            if (grid[i][j] == 2048) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 function setup() {
     createCanvas(400, 400);
     noLoop();
     grid = blankGrid();
+    grid_new = blankGrid();
     addNumber();
     addNumber();
     updateCanvas();
@@ -48,19 +61,34 @@ function drawGrid() {
         for (let j = 0; j < 4; j++) {
             noFill();
             strokeWeight(2);
-            stroke(0);
-            rect(i * w, j * w, w, w);
-
             let val = grid[i][j];
+            let s = val.toString();
+            stroke(0);
+
+            if (grid_new[i][j] == 1) {
+                stroke(200, 100, 200);
+                strokeWeight(6);
+                grid_new[i][j] = 0;
+            } else {
+                strokeWeight(2);
+                stroke(0);
+            }
+
+            if (val != 0) {
+                fill(colorsSizes[s].color);
+            } else {
+                noFill();
+            }
+            rect(i * w, j * w, w, w, 30);
+
             if (grid[i][j] != 0) {
                 textAlign(CENTER, CENTER);
                 // let fs = map(log(val), 0, log(2048), 64, 16);
-                let s = "" + val;
-                let len = s.length - 1;
-                let sizes = [64, 64, 48, 32];
-                fill(0);
+                // let len = s.length - 1;
+                // let sizes = [64, 64, 48, 32];
                 noStroke();
-                textSize(sizes[len]);
+                fill(0);
+                textSize(colorsSizes[s].size);
                 text(val, i * w + w / 2, j * w + w / 2);
             }
         }
@@ -95,11 +123,9 @@ function keyPressed() {
         for (let i = 0; i < 4; i++) {
             grid[i] = operate(grid[i]);
         }
-
         if (flipped) {
             grid = flipGrid(grid);
         }
-
         if (rotated) {
             grid = rotateGrid(grid);
             grid = rotateGrid(grid);
@@ -111,9 +137,11 @@ function keyPressed() {
         }
 
         updateCanvas();
-        let gameover = isGameOver();
-        if (gameover) {
-            console.log('GAME OVER')
+        if (isGameOver()) {
+            console.log('GAME OVER');
+        }
+        if (isGameWon()) {
+            console.log('GAME WON');
         }
     }
 }
@@ -197,7 +225,9 @@ function addNumber() {
         }
     }
 
-    if (options.length > 0);
-    let spot = random(options);
-    grid[spot.x][spot.y] = random(1) > 0.5 ? 2 : 4;
+    if (options.length > 0) {
+        let spot = random(options);
+        grid[spot.x][spot.y] = random(1) > 0.1 ? 2 : 4;
+        grid_new[spot.x][spot.y] = 1;
+    }
 }
